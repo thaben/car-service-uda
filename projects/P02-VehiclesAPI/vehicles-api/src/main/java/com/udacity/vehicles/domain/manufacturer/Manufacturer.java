@@ -7,7 +7,7 @@ import javax.persistence.Id;
  * Declares class to hold car manufacturer information.
  */
 @Entity
-public class Manufacturer {
+public class    Manufacturer {
 
     @Id
     private Integer code;

@@ -104,4 +104,18 @@ public class Car {
     public void setPrice(String price) {
         this.price = price;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Car{");
+        sb.append("id=").append(id);
+        sb.append(", createdAt=").append(createdAt);
+        sb.append(", modifiedAt=").append(modifiedAt);
+        sb.append(", condition=").append(condition);
+        sb.append(", details=").append(details);
+        sb.append(", location=").append(location);
+        sb.append(", price='").append(price).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }

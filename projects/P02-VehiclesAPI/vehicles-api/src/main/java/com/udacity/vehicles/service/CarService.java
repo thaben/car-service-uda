@@ -1,8 +1,13 @@
 package com.udacity.vehicles.service;
 
+import com.udacity.vehicles.client.maps.MapsClient;
+import com.udacity.vehicles.client.prices.PriceClient;
 import com.udacity.vehicles.domain.car.Car;
 import com.udacity.vehicles.domain.car.CarRepository;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,13 +18,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class CarService {
 
-    private final CarRepository repository;
+    private Logger logger = LoggerFactory.getLogger(CarService.class);
 
-    public CarService(CarRepository repository) {
+    private final CarRepository repository;
+    private MapsClient mapsClient;
+    private PriceClient priceClient;
+    public CarService(CarRepository repository,MapsClient mapsClient,PriceClient priceClient ) {
         /**
          * TODO: Add the Maps and Pricing Web Clients you create
          *   in `VehiclesApiApplication` as arguments and set them here.
          */
+        this.priceClient = priceClient;
+        this.mapsClient = mapsClient;
         this.repository = repository;
     }
 
@@ -37,12 +47,14 @@ public class CarService {
      * @return the requested car's information, including location and price
      */
     public Car findById(Long id) {
+
+
+
         /**
          * TODO: Find the car by ID from the `repository` if it exists.
          *   If it does not exist, throw a CarNotFoundException
          *   Remove the below code as part of your implementation.
          */
-        Car car = new Car();
 
         /**
          * TODO: Use the Pricing Web client you create in `VehiclesApiApplication`
@@ -51,8 +63,6 @@ public class CarService {
          * Note: The car class file uses @transient, meaning you will need to call
          *   the pricing service each time to get the price.
          */
-
-
         /**
          * TODO: Use the Maps Web client you create in `VehiclesApiApplication`
          *   to get the address for the vehicle. You should access the location
@@ -63,6 +73,9 @@ public class CarService {
          */
 
 
+        Car car = repository.findById(id).orElseThrow(()->new CarNotFoundException());
+        car.setPrice(priceClient.getPrice(id));
+        car.setLocation(  mapsClient.getAddress(car.getLocation()));
         return car;
     }
 
@@ -72,7 +85,9 @@ public class CarService {
      * @return the new/updated car is stored in the repository
      */
     public Car save(Car car) {
+        logger.info("save() car {}", car);
         if (car.getId() != null) {
+            logger.info("updating car");
             return repository.findById(car.getId())
                     .map(carToBeUpdated -> {
                         carToBeUpdated.setDetails(car.getDetails());
@@ -80,7 +95,7 @@ public class CarService {
                         return repository.save(carToBeUpdated);
                     }).orElseThrow(CarNotFoundException::new);
         }
-
+        logger.info("saving new car");
         return repository.save(car);
     }
 
@@ -89,16 +104,6 @@ public class CarService {
      * @param id the ID number of the car to delete
      */
     public void delete(Long id) {
-        /**
-         * TODO: Find the car by ID from the `repository` if it exists.
-         *   If it does not exist, throw a CarNotFoundException
-         */
-
-
-        /**
-         * TODO: Delete the car from the repository.
-         */
-
-
+        repository.delete( repository.findById(id).orElseThrow(()->new CarNotFoundException()));
     }
 }

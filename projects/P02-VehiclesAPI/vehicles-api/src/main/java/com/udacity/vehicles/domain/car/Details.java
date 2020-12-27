@@ -116,4 +116,21 @@ public class Details {
     public void setExternalColor(String externalColor) {
         this.externalColor = externalColor;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Details{");
+        sb.append("body='").append(body).append('\'');
+        sb.append(", model='").append(model).append('\'');
+        sb.append(", manufacturer=").append(manufacturer);
+        sb.append(", numberOfDoors=").append(numberOfDoors);
+        sb.append(", fuelType='").append(fuelType).append('\'');
+        sb.append(", engine='").append(engine).append('\'');
+        sb.append(", mileage=").append(mileage);
+        sb.append(", modelYear=").append(modelYear);
+        sb.append(", productionYear=").append(productionYear);
+        sb.append(", externalColor='").append(externalColor).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }

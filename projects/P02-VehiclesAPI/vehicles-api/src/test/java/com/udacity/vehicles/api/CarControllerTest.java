@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -97,6 +98,12 @@ public class CarControllerTest {
          *   below (the vehicle will be the first in the list).
          */
 
+        mvc.perform(
+                get(new URI("/cars"))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+           .andExpect(status().isOk());
+
     }
 
     /**
@@ -109,6 +116,12 @@ public class CarControllerTest {
          * TODO: Add a test to check that the `get` method works by calling
          *   a vehicle by ID. This should utilize the car from `getCar()` below.
          */
+        Car car = getCar();
+        mvc.perform(
+                get(new URI("/cars/1"))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+           .andExpect(status().isOk()).andExpect(jsonPath("details.body",is("sedan")));
     }
 
     /**
@@ -122,7 +135,27 @@ public class CarControllerTest {
          *   when the `delete` method is called from the Car Controller. This
          *   should utilize the car from `getCar()` below.
          */
+
+        mvc.perform(
+                delete(new URI("/cars/1"))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+           .andExpect(status().isNoContent());
     }
+
+    @Test
+    public void updateCar() throws Exception {
+        Car car = getCar();
+        car.getDetails().setMileage(666);
+        given(carService.save(any())).willReturn(car);
+        mvc.perform(
+                put(new URI("/cars/1"))
+                        .content(json.write(car).getJson())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+           .andExpect(status().isOk()).andExpect(jsonPath("details.mileage",is(666)));
+    }
+
 
     /**
      * Creates an example Car object for use in testing.
